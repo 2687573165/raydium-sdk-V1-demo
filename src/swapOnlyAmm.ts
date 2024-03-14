@@ -7,8 +7,10 @@ import {
   Percent,
   Token,
   TokenAmount,
+  TOKEN_PROGRAM_ID,
+  
 } from '@raydium-io/raydium-sdk';
-import { Keypair } from '@solana/web3.js';
+import { Keypair ,PublicKey} from '@solana/web3.js';
 
 import {
   connection,
@@ -17,6 +19,7 @@ import {
   makeTxVersion,
   RAYDIUM_MAINNET_API,
   wallet,
+  
 } from '../config';
 import {
   buildAndSendTx,
@@ -46,7 +49,7 @@ async function swapOnlyAmm(input: TestTxInputInfo) {
   const targetPoolInfo = [...ammPool.official, ...ammPool.unOfficial].find((info) => info.id === input.targetPool)
   assert(targetPoolInfo, 'cannot find the target pool')
   const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys
-
+  console.log(poolKeys)
   // -------- step 1: coumpute amount out --------
   const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
     poolKeys: poolKeys,
@@ -76,10 +79,13 @@ async function swapOnlyAmm(input: TestTxInputInfo) {
 }
 
 async function howToUse() {
-  const inputToken = DEFAULT_TOKEN.USDC // USDC
-  const outputToken = DEFAULT_TOKEN.RAY // RAY
-  const targetPool = 'EVzLJhqMtdC1nPmz8rNd6xGfVjDPxpLZgq7XJuNfMZ6' // USDC-RAY pool
-  const inputTokenAmount = new TokenAmount(inputToken, 10000)
+  const   outputToken = DEFAULT_TOKEN.WSOL // USDC
+  const   inputToken =new Token(TOKEN_PROGRAM_ID, new PublicKey('7Ts7ZST96TZdb1AJ4hKBK8VhoJi45h7rYuK214nERMZf'), 6, 'USDC', 'USDC') // RAY
+  const targetPool = 'HNeta6oxYy6DHT5gwEBFbxNeAj7U3wutUWzZtcjc2W17' // USDC-RAY pool
+
+
+  const inputTokenAmount = new TokenAmount(inputToken, 2000,false)
+
   const slippage = new Percent(1, 100)
   const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey)
 
@@ -95,3 +101,4 @@ async function howToUse() {
     console.log('txids', txids)
   })
 }
+howToUse()
